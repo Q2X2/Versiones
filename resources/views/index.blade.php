@@ -1,3 +1,6 @@
+{{-- Vista: Pantalla de Login --}}
+{{-- Punto de entrada de la aplicación Rueda Verde --}}
+
 @extends('layouts.app')
 
 @push('styles')
@@ -8,6 +11,7 @@
 
 <div class="login-container">
 
+    {{-- Logo de la aplicación --}}
     <img src="/img/logo-rueda-verde.png" class="logo" alt="Logo Rueda Verde">
 
     <h1 class="titulo">Rueda Verde</h1>
@@ -18,9 +22,11 @@
         Ingresa tu usuario o placa del vehículo
     </p>
 
+    {{-- Formulario POST de login --}}
     <form action="{{ route('login.post') }}" method="POST">
         @csrf
 
+        {{-- Campo de entrada principal --}}
         <input
             id="loginInput"
             class="login-input"
@@ -31,8 +37,11 @@
             required
         >
 
+        {{-- Mensaje de error si el login falla --}}
         @if(session('error'))
-            <p style="color:red; font-size:14px; margin-top:8px;">{{ session('error') }}</p>
+            <p style="color:red; font-size:14px; margin-top:8px;">
+                {{ session('error') }}
+            </p>
         @endif
 
         <button type="submit" class="login-btn">Continuar</button>

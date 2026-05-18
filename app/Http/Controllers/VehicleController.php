@@ -4,31 +4,61 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Vehicle;
+use App\Models\Cliente;
 
+/**
+ * VehicleController
+ * 
+ * Controlador CRUD para la gestión de vehículos del autolavado.
+ * Maneja las operaciones: listar, crear, guardar, ver, editar, actualizar y eliminar.
+ */
 class VehicleController extends Controller
 {
-    // GET /vehicles — lista todos los vehículos
+    /**
+     * GET /vehicles
+     * Muestra la lista de todos los vehículos registrados (turnos).
+     */
     public function index()
     {
-        $vehicles = Vehicle::all();
+        // Obtener todos los vehículos con su cliente relacionado
+        $vehicles = Vehicle::with('cliente')->get();
+
         return view('vehicles.index', compact('vehicles'));
     }
 
-    // GET /vehicles/create — formulario de registro
+    /**
+     * GET /vehicles/create
+     * Muestra el formulario para registrar un nuevo vehículo.
+     */
     public function create()
     {
-        return view('vehicles.create');
+        // Pasar lista de clientes al formulario para el select
+        $clientes = Cliente::all();
+
+        return view('vehicles.create', compact('clientes'));
     }
 
-    // POST /vehicles — guarda el nuevo vehículo
+    /**
+     * POST /vehicles
+     * Guarda un nuevo vehículo en la base de datos.
+     */
     public function store(Request $request)
     {
+        // Validación con mensajes de error en español
         $request->validate([
             'placa'       => 'required|string|max:20|unique:vehiculo,placa',
             'propietario' => 'required|string|max:100',
             'servicio'    => 'required|string|max:100',
+            'id_cliente'  => 'nullable|exists:cliente,id_cliente',
+        ], [
+            'placa.required'       => 'La placa es obligatoria.',
+            'placa.unique'         => 'Esta placa ya está registrada.',
+            'propietario.required' => 'El nombre del propietario es obligatorio.',
+            'servicio.required'    => 'El servicio es obligatorio.',
+            'id_cliente.exists'    => 'El cliente seleccionado no existe.',
         ]);
 
+        // Crear el vehículo con los datos validados
         Vehicle::create([
             'placa'       => strtoupper($request->placa),
             'propietario' => $request->propietario,
@@ -37,36 +67,59 @@ class VehicleController extends Controller
             'servicio'    => $request->servicio,
             'estado'      => $request->estado ?? 'En espera',
             'hora'        => $request->hora,
+            'id_cliente'  => $request->id_cliente,
         ]);
 
         return redirect()->route('vehicles.index');
     }
 
-    // GET /vehicles/{id} — detalle del vehículo
+    /**
+     * GET /vehicles/{id}
+     * Muestra el detalle y estado de un vehículo específico.
+     */
     public function show($id)
     {
-        $vehicle = Vehicle::findOrFail($id);
+        // Buscar vehículo o retornar 404
+        $vehicle = Vehicle::with('cliente')->findOrFail($id);
+
         return view('vehicles.show', compact('vehicle'));
     }
 
-    // GET /vehicles/{id}/edit — formulario de edición
+    /**
+     * GET /vehicles/{id}/edit
+     * Muestra el formulario para editar un vehículo existente.
+     */
     public function edit($id)
     {
-        $vehicle = Vehicle::findOrFail($id);
-        return view('vehicles.edit', compact('vehicle'));
+        $vehicle  = Vehicle::findOrFail($id);
+        $clientes = Cliente::all();
+
+        return view('vehicles.edit', compact('vehicle', 'clientes'));
     }
 
-    // PUT /vehicles/{id} — actualiza el vehículo
+    /**
+     * PUT /vehicles/{id}
+     * Actualiza los datos de un vehículo existente.
+     */
     public function update(Request $request, $id)
     {
+        // Validación ignorando la placa del vehículo actual (unique)
         $request->validate([
             'placa'       => 'required|string|max:20|unique:vehiculo,placa,' . $id . ',id_vehiculo',
             'propietario' => 'required|string|max:100',
             'servicio'    => 'required|string|max:100',
+            'id_cliente'  => 'nullable|exists:cliente,id_cliente',
+        ], [
+            'placa.required'       => 'La placa es obligatoria.',
+            'placa.unique'         => 'Esta placa ya está registrada.',
+            'propietario.required' => 'El nombre del propietario es obligatorio.',
+            'servicio.required'    => 'El servicio es obligatorio.',
+            'id_cliente.exists'    => 'El cliente seleccionado no existe.',
         ]);
 
         $vehicle = Vehicle::findOrFail($id);
 
+        // Actualizar campos del vehículo
         $vehicle->update([
             'placa'       => strtoupper($request->placa),
             'propietario' => $request->propietario,
@@ -75,15 +128,20 @@ class VehicleController extends Controller
             'servicio'    => $request->servicio,
             'estado'      => $request->estado,
             'hora'        => $request->hora,
+            'id_cliente'  => $request->id_cliente,
         ]);
 
         return redirect()->route('vehicles.index');
     }
 
-    // DELETE /vehicles/{id} — elimina el vehículo
+    /**
+     * DELETE /vehicles/{id}
+     * Elimina un vehículo de la base de datos.
+     */
     public function destroy($id)
     {
         Vehicle::destroy($id);
+
         return redirect()->route('vehicles.index');
     }
 }

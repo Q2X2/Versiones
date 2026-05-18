@@ -1,3 +1,6 @@
+{{-- Vista: Estado del Vehículo --}}
+{{-- Muestra el detalle completo del vehículo y su estado en el autolavado --}}
+
 @extends('layouts.app')
 
 @push('styles')
@@ -13,10 +16,12 @@
 
 <div class="estado-container">
 
+    {{-- Imagen del vehículo --}}
     <div class="car-card">
         <img src="/img/carro.jpg" alt="Vehículo">
     </div>
 
+    {{-- Información detallada del vehículo --}}
     <div class="info">
 
         <div class="info-item">
@@ -41,9 +46,10 @@
 
         <div class="info-item">
             <span>Estado</span>
-            <span>{{ $vehicle->estado ?? 'En espera' }}</span>
+            <span>{{ $vehicle->estado }}</span>
         </div>
 
+        {{-- Mostrar hora solo si fue registrada --}}
         @if($vehicle->hora)
         <div class="info-item">
             <span>Hora</span>
@@ -51,6 +57,7 @@
         </div>
         @endif
 
+        {{-- Mostrar teléfono si existe --}}
         @if($vehicle->telefono)
         <div class="info-item">
             <span>Teléfono</span>
@@ -58,8 +65,17 @@
         </div>
         @endif
 
+        {{-- Mostrar cliente asociado si existe --}}
+        @if($vehicle->cliente)
+        <div class="info-item">
+            <span>Cliente</span>
+            <span>{{ $vehicle->cliente->nombre }}</span>
+        </div>
+        @endif
+
     </div>
 
+    {{-- Calificación visual --}}
     <div class="calificacion">
         ★★★★★
     </div>

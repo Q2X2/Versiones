@@ -1,68 +1,64 @@
-TOMASHERNANDEZPADILLA_AA2_EV02
+TOMASHERNANDEZPADILLA_AA3_EV01
 ==============================
-Proyecto: Rueda Verde — Módulo web funcional Laravel
+Proyecto: Rueda Verde — Autolavado
+Actividad: AA3-EV01 Codificación de módulos stand-alone, web y móvil
 
 REQUISITOS CUMPLIDOS
 --------------------
-✔ Módulo web funcional con formularios HTML
-✔ Conexión backend: rutas y controladores (Laravel)
-✔ Métodos GET y POST
-✔ Vistas Blade para renderizar HTML
-✔ Versionado con Git
-✔ Diseño front-end original integrado (CSS, fuentes, imágenes)
+✔ Aplicación web funcional con CRUD completo (2 modelos: Vehicle y Cliente)
+✔ Integración front-end + back-end + base de datos
+✔ Validación de formularios con mensajes de error en español
+✔ Versionado con Git (commits descriptivos)
+✔ Estándares de codificación (PascalCase en clases, snake_case en BD y variables)
+✔ Comentarios en controladores, modelos, migraciones y vistas Blade
+✔ Sin carpetas vendor/ ni node_modules/ en el ZIP
 
-ESTRUCTURA DEL PROYECTO
------------------------
+
+MODELOS
+-------
+1. Vehicle (vehiculo)    — CRUD completo de vehículos en turno
+2. Cliente (cliente)     — CRUD completo de clientes del autolavado
+   Relación: Un cliente tiene muchos vehículos (hasMany / belongsTo)
+
+ESTRUCTURA
+----------
 app/Http/Controllers/
-  LoginController.php     — GET / (login), POST /login
-  VehicleController.php   — CRUD completo de vehículos
+  LoginController.php    — GET / y POST /login
+  VehicleController.php  — CRUD completo vehículos
+  ClienteController.php  — CRUD completo clientes
 
 app/Models/
-  Vehicle.php             — Modelo tabla 'vehiculo'
+  Vehicle.php            — Modelo vehiculo con relación a Cliente
+  Cliente.php            — Modelo cliente con relación a Vehicle
 
 database/migrations/
-  ..._create_vehicles_table.php — Migración tabla vehiculo
+  ..._create_vehicles_table.php — Tablas: cliente y vehiculo
 
 resources/views/
-  layouts/app.blade.php   — Layout principal
-  index.blade.php         — Pantalla de login
-  vehicles/
-    index.blade.php       — Lista de turnos
-    create.blade.php      — Formulario registro
-    edit.blade.php        — Formulario edición
-    show.blade.php        — Estado del vehículo
+  layouts/app.blade.php  — Layout base
+  index.blade.php        — Login
+  vehicles/              — Vistas CRUD vehículos
+  clientes/              — Vistas CRUD clientes
 
-routes/web.php            — Todas las rutas GET/POST/PUT/DELETE
+routes/web.php           — Rutas GET/POST/PUT/DELETE comentadas
+public/css, fonts, img   — Assets del front-end
 
-public/
-  css/    — Estilos del front-end
-  fonts/  — Fuente Inter
-  img/    — Logo y carro
-  js/     — app.js
-
-CONFIGURACIÓN (ajustar .env)
------------------------------
+CONFIGURACIÓN (.env)
+--------------------
 DB_DATABASE=autolavado
 DB_USERNAME=root
-DB_PASSWORD=Server
+DB_PASSWORD=             ← vacío en XAMPP por defecto
 
-COMANDOS PARA CORRER
---------------------
+COMANDOS
+--------
 composer install
 php artisan migrate
-php artisan serve
+php -S 127.0.0.1:8081 -t public
 
+Abrir: http://127.0.0.1:8081
 
-RUTAS DISPONIBLES
------------------
-GET  /                    → Login
-POST /login               → Procesar login
-GET  /vehicles            → Lista vehículos (turnos)
-GET  /vehicles/create     → Formulario registro
-POST /vehicles            → Guardar vehículo
-GET  /vehicles/{id}       → Ver estado
-GET  /vehicles/{id}/edit  → Formulario edición
-PUT  /vehicles/{id}       → Actualizar vehículo
-DELETE /vehicles/{id}     → Eliminar vehículo
-
-Link Github: https://github.com/Q2X2/Versiones.git
+ACCESO
+------
+- "TurnosTrabajadores"     → lista de vehículos (trabajador)
+- Texto 6-11 caracteres    → registrar vehículo (cliente)
+- Texto menor a 6 chars    → ver turnos
