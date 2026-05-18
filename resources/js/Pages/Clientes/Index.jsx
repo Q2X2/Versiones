@@ -7,10 +7,9 @@
 
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
-import FlashMessage from '../../Components/FlashMessage';
 
 export default function ClientesIndex({ clientes }) {
-    const { flash } = usePage().props;
+    const { flash: _flash } = usePage().props;
 
     // Eliminar cliente con confirmación
     function handleDelete(id) {
@@ -24,8 +23,6 @@ export default function ClientesIndex({ clientes }) {
             <Head title="Clientes" />
 
             <MainLayout title="Clientes" backRoute="/vehicles">
-
-                <FlashMessage message={flash?.success} type="success" />
 
                 <div style={{ padding: '12px' }}>
                     <Link href="/clientes/create">
@@ -74,6 +71,10 @@ export default function ClientesIndex({ clientes }) {
 
                                 {/* Acciones */}
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'center' }}>
+                                    <Link href={`/clientes/${cliente.id_cliente}`}
+                                        style={{ fontSize: '12px', color: '#555', textDecoration: 'none' }}>
+                                        Ver
+                                    </Link>
                                     <Link href={`/clientes/${cliente.id_cliente}/edit`}
                                         style={{ fontSize: '12px', color: '#48C9B0', textDecoration: 'none' }}>
                                         Editar

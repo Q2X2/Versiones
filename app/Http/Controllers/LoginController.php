@@ -34,9 +34,9 @@ class LoginController extends Controller
             return back()->withErrors(['login_input' => 'Por favor ingresa un usuario o placa.']);
         }
 
-        // Acceso de trabajador con clave especial
+        // Acceso de trabajador con clave especial → Dashboard
         if ($input === 'TurnosTrabajadores') {
-            return redirect()->route('vehicles.index');
+            return redirect()->route('dashboard');
         }
 
         // Placa del vehículo (6 a 11 caracteres)

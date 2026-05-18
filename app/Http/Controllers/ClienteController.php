@@ -63,6 +63,19 @@ class ClienteController extends Controller
     }
 
     /**
+     * GET /clientes/{id}
+     * Retorna la página React Clientes/Show con el detalle del cliente.
+     */
+    public function show($id)
+    {
+        $cliente = Cliente::with('vehiculos')->findOrFail($id);
+
+        return Inertia::render('Clientes/Show', [
+            'cliente' => $cliente,
+        ]);
+    }
+
+    /**
      * GET /clientes/{id}/edit
      * Retorna la página React Clientes/Edit.
      */

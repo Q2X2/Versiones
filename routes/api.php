@@ -44,16 +44,17 @@ Route::get('/', function () {
 | PUT    /api/vehicles/{id}      → actualiza un vehículo
 | DELETE /api/vehicles/{id}      → elimina un vehículo
 */
-Route::apiResource('vehicles', VehicleApiController::class);
-
 /*
 |--------------------------------------------------------------------------
 | Rutas adicionales de Vehículos
 |--------------------------------------------------------------------------
 | GET /api/vehicles/estado/{estado} → filtra por estado
+| IMPORTANTE: debe ir ANTES de apiResource para no ser capturada como {vehicle}
 | Ejemplo: /api/vehicles/estado/Listo
 */
 Route::get('vehicles/estado/{estado}', [VehicleApiController::class, 'porEstado']);
+
+Route::apiResource('vehicles', VehicleApiController::class);
 
 /*
 |--------------------------------------------------------------------------

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,6 +17,9 @@ use App\Http\Controllers\LoginController;
 // --- Login ---
 Route::get('/', [LoginController::class, 'index'])->name('index');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+
+// --- Dashboard (panel de control con estadísticas y explorador de API) ---
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 // --- CRUD Vehículos (Inertia → React) ---
 Route::resource('vehicles', VehicleController::class);

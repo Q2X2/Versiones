@@ -7,11 +7,10 @@
 
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
-import FlashMessage from '../../Components/FlashMessage';
 
 export default function VehiclesIndex({ vehicles }) {
     // Obtener mensajes flash del backend
-    const { flash } = usePage().props;
+    const { flash: _flash } = usePage().props;
 
     // Eliminar vehículo con confirmación
     function handleDelete(id) {
@@ -24,10 +23,7 @@ export default function VehiclesIndex({ vehicles }) {
         <>
             <Head title="Turnos de Vehículos" />
 
-            <MainLayout title="Turnos de Vehículos" backRoute="/">
-
-                {/* Mensaje flash de éxito */}
-                <FlashMessage message={flash?.success} type="success" />
+            <MainLayout title="Turnos de Vehículos" backRoute="/dashboard">
 
                 {/* Botones de acción */}
                 <div style={{ padding: '12px', display: 'flex', gap: '8px' }}>
