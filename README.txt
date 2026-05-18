@@ -1,55 +1,41 @@
 TOMASHERNANDEZPADILLA_AA4_EV03
 ==============================
 Proyecto: Rueda Verde — Autolavado
-Actividad: AA4-EV03 Componente frontend con React JS + Inertia
-
+Actividad: AA4-EV03 Frontend React JS + API REST
 
 TECNOLOGÍAS
 -----------
 - Laravel 12 (Backend)
 - React 18 (Frontend)
-- Inertia.js v2 (Puente Laravel ↔ React, sin API REST)
-- Vite (Bundler)
-- TailwindCSS v4
+- Inertia.js v2 (Puente Laravel ↔ React)
+- API REST JSON (consumible por apps externas)
+- CORS habilitado (config/cors.php)
+- Vite + TailwindCSS v4
 
-REQUISITOS CUMPLIDOS
---------------------
-✔ Frontend desarrollado con React JS
-✔ Navegación funcional con Inertia Link (sin recargar página)
-✔ Formularios login y registro con React
-✔ Validaciones con $request->validate, errores inyectados en React
-✔ Mensajes flash de éxito/error compartidos globalmente
-✔ Soporte multi-idioma (lang/es/messages.php y lang/en/messages.php)
-✔ Comentarios en todos los componentes y controladores
-✔ Estándares: PascalCase en clases/componentes, snake_case en BD
-✔ Sin vendor/ ni node_modules/ en el ZIP
-✔ Versionado con Git
+ESTRUCTURA API REST
+-------------------
+routes/api.php                          → Todas las rutas API
+app/Http/Controllers/Api/
+  VehicleApiController.php              → CRUD vehículos en JSON
+  ClienteApiController.php             → CRUD clientes en JSON
+config/cors.php                         → Configuración CORS
 
-ESTRUCTURA REACT
-----------------
-resources/js/
-  app.jsx                    → Punto de entrada Inertia + React
-  Layouts/
-    MainLayout.jsx           → Layout principal con header y flash
-  Components/
-    InputField.jsx           → Campo de formulario reutilizable
-    FlashMessage.jsx         → Mensajes flash auto-ocultables
-  Pages/
-    Login.jsx                → Pantalla de login
-    Vehicles/
-      Index.jsx              → Lista de vehículos
-      Create.jsx             → Formulario registro
-      Edit.jsx               → Formulario edición
-      Show.jsx               → Detalle del vehículo
-    Clientes/
-      Index.jsx              → Lista de clientes
-      Create.jsx             → Formulario registro
-      Edit.jsx               → Formulario edición
+ENDPOINTS API
+-------------
+GET    /api/                            → Estado de la API
+GET    /api/vehicles                    → Lista vehículos
+POST   /api/vehicles                    → Crear vehículo
+GET    /api/vehicles/{id}               → Detalle vehículo
+PUT    /api/vehicles/{id}               → Actualizar vehículo
+DELETE /api/vehicles/{id}               → Eliminar vehículo
+GET    /api/vehicles/estado/{estado}    → Filtrar por estado (adicional)
 
-MULTI-IDIOMA
-------------
-lang/es/messages.php  → Traducciones en español
-lang/en/messages.php  → Traducciones en inglés
+GET    /api/clientes                    → Lista clientes
+POST   /api/clientes                    → Crear cliente
+GET    /api/clientes/{id}               → Detalle cliente
+PUT    /api/clientes/{id}               → Actualizar cliente
+DELETE /api/clientes/{id}               → Eliminar cliente
+GET    /api/clientes/{id}/vehiculos     → Vehículos de un cliente (adicional)
 
 INSTALACIÓN
 -----------
@@ -59,8 +45,5 @@ npm run build
 php artisan migrate:fresh
 php artisan serve
 
-O para desarrollo con hot-reload:
-php artisan serve  (en una terminal)
-npm run dev        (en otra terminal)
-
 Abrir: http://localhost:8000
+API:   http://localhost:8000/api/vehicles
