@@ -1,0 +1,486 @@
+================================================================================
+  DOCUMENTACIÓN API REST — RUEDA VERDE AUTOLAVAD
+================================================================================
+1. DESCRIPCIÓN GENERAL
+================================================================================
+
+La API REST de Rueda Verde permite a aplicaciones externas (móvil, web,
+Postman, etc.) consumir los servicios del sistema de autolavado.
+
+Tecnología:   Laravel 12
+Estándar:     REST (Representational State Transfer)
+Formato:      JSON (application/json)
+CORS:         Habilitado para todos los orígenes (config/cors.php)
+Base URL:     http://localhost:8000/api
+
+Todos los endpoints retornan JSON con la siguiente estructura base:
+
+  Éxito:
+  {
+    "success": true,
+    "data": { ... },
+    "message": "Mensaje descriptivo"
+  }
+
+  Error:
+  {
+    "success": false,
+    "message": "Descripción del error"
+  }
+
+================================================================================
+2. CÓDIGOS HTTP UTILIZADOS
+================================================================================
+
+  200 OK             → Solicitud exitosa (GET, PUT, DELETE)
+  201 Created        → Recurso creado exitosamente (POST)
+  404 Not Found      → Recurso no encontrado
+  422 Unprocessable  → Error de validación (campos inválidos o faltantes)
+
+================================================================================
+3. MODELOS DE DATOS
+================================================================================
+
+--- VEHÍCULO (vehiculo) ---
+  id_vehiculo   integer   Identificador único (PK)
+  placa         string    Placa del vehículo (único, máx 20 caracteres)
+  propietario   string    Nombre del propietario (máx 100 caracteres)
+  telefono      string    Teléfono de contacto (opcional, máx 20)
+  modelo        string    Modelo del vehículo (opcional, máx 80)
+  servicio      string    Servicio solicitado (máx 100 caracteres)
+  estado        string    Estado del turno: "En espera", "En proceso", "Listo"
+  hora          time      Hora de atención en formato HH:MM (opcional)
+  id_cliente    integer   FK hacia cliente (opcional)
+
+--- CLIENTE (cliente) ---
+  id_cliente    integer   Identificador único (PK)
+  nombre        string    Nombre completo del cliente (máx 100 caracteres)
+  telefono      string    Teléfono de contacto (opcional, máx 20)
+  correo        string    Correo electrónico único (opcional, máx 100)
+
+================================================================================
+4. SERVICIOS — VEHÍCULOS
+================================================================================
+
+Controlador: App\Http\Controllers\Api\VehicleApiController
+Base URL:    /api/vehicles
+
+--------------------------------------------------------------------------------
+4.1 LISTAR TODOS LOS VEHÍCULOS
+--------------------------------------------------------------------------------
+Método:      GET
+URL:         /api/vehicles
+Descripción: Retorna la lista completa de vehículos registrados.
+             Incluye el cliente relacionado si existe.
+Parámetros:  Ninguno
+Autenticación: No requerida
+
+Respuesta exitosa (200):
+{
+  "success": true,
+  "data": [
+    {
+      "id_vehiculo": 1,
+      "placa": "ABC123",
+      "propietario": "Juan Pérez",
+      "telefono": "3001234567",
+      "modelo": "Toyota Corolla 2020",
+      "servicio": "Lavado completo",
+      "estado": "En espera",
+      "hora": "10:30",
+      "id_cliente": 1,
+      "cliente": {
+        "id_cliente": 1,
+        "nombre": "Juan Pérez",
+        "correo": "juan@email.com"
+      }
+    }
+  ],
+  "total": 1
+}
+
+--------------------------------------------------------------------------------
+4.2 CREAR UN VEHÍCULO
+--------------------------------------------------------------------------------
+Método:      POST
+URL:         /api/vehicles
+Descripción: Registra un nuevo vehículo en el sistema.
+             Retorna 201 si es exitoso, 422 si hay errores de validación.
+
+Headers:
+  Content-Type: application/json
+
+Body (JSON):
+{
+  "placa":       "ABC123",      [requerido] Placa única del vehículo
+  "propietario": "Juan Pérez",  [requerido] Nombre del propietario
+  "servicio":    "Lavado",      [requerido] Tipo de servicio
+  "telefono":    "3001234567",  [opcional]
+  "modelo":      "Toyota 2020", [opcional]
+  "estado":      "En espera",   [opcional] "En espera" | "En proceso" | "Listo"
+  "hora":        "10:30",       [opcional] Formato HH:MM
+  "id_cliente":  1              [opcional] ID de cliente existente
+}
+
+Respuesta exitosa (201):
+{
+  "success": true,
+  "message": "Vehículo registrado exitosamente.",
+  "data": {
+    "id_vehiculo": 2,
+    "placa": "ABC123",
+    "propietario": "Juan Pérez",
+    "servicio": "Lavado",
+    "estado": "En espera"
+  }
+}
+
+Error de validación (422):
+{
+  "message": "The placa has already been taken.",
+  "errors": {
+    "placa": ["The placa has already been taken."]
+  }
+}
+
+--------------------------------------------------------------------------------
+4.3 OBTENER UN VEHÍCULO
+--------------------------------------------------------------------------------
+Método:      GET
+URL:         /api/vehicles/{id}
+Descripción: Retorna el detalle de un vehículo específico por su ID.
+
+Parámetros de ruta:
+  id  →  ID del vehículo (id_vehiculo)
+
+Respuesta exitosa (200):
+{
+  "success": true,
+  "data": {
+    "id_vehiculo": 1,
+    "placa": "ABC123",
+    "propietario": "Juan Pérez",
+    "servicio": "Lavado completo",
+    "estado": "En proceso",
+    "cliente": { ... }
+  }
+}
+
+Error (404):
+{
+  "success": false,
+  "message": "Vehículo no encontrado."
+}
+
+--------------------------------------------------------------------------------
+4.4 ACTUALIZAR UN VEHÍCULO
+--------------------------------------------------------------------------------
+Método:      PUT
+URL:         /api/vehicles/{id}
+Descripción: Actualiza los datos de un vehículo existente.
+
+Headers:
+  Content-Type: application/json
+
+Parámetros de ruta:
+  id  →  ID del vehículo a actualizar
+
+Body (JSON): Mismos campos que POST (todos requeridos/opcionales igual)
+
+Respuesta exitosa (200):
+{
+  "success": true,
+  "message": "Vehículo actualizado exitosamente.",
+  "data": { ... }
+}
+
+Error (404):
+{
+  "success": false,
+  "message": "Vehículo no encontrado."
+}
+
+--------------------------------------------------------------------------------
+4.5 ELIMINAR UN VEHÍCULO
+--------------------------------------------------------------------------------
+Método:      DELETE
+URL:         /api/vehicles/{id}
+Descripción: Elimina un vehículo del sistema por su ID.
+
+Parámetros de ruta:
+  id  →  ID del vehículo a eliminar
+
+Respuesta exitosa (200):
+{
+  "success": true,
+  "message": "Vehículo eliminado exitosamente."
+}
+
+Error (404):
+{
+  "success": false,
+  "message": "Vehículo no encontrado."
+}
+
+--------------------------------------------------------------------------------
+4.6 FILTRAR VEHÍCULOS POR ESTADO (ruta adicional)
+--------------------------------------------------------------------------------
+Método:      GET
+URL:         /api/vehicles/estado/{estado}
+Descripción: Retorna todos los vehículos que tienen un estado específico.
+             Útil para apps móviles que muestran el turno del cliente.
+
+Parámetros de ruta:
+  estado  →  "En espera" | "En proceso" | "Listo"
+
+Ejemplos:
+  GET /api/vehicles/estado/Listo
+  GET /api/vehicles/estado/En espera
+  GET /api/vehicles/estado/En proceso
+
+Respuesta exitosa (200):
+{
+  "success": true,
+  "data": [ ... ],
+  "total": 3,
+  "estado": "Listo"
+}
+
+Error de estado inválido (422):
+{
+  "success": false,
+  "message": "Estado no válido. Use: En espera, En proceso, Listo."
+}
+
+================================================================================
+5. SERVICIOS — CLIENTES
+================================================================================
+
+Controlador: App\Http\Controllers\Api\ClienteApiController
+Base URL:    /api/clientes
+
+--------------------------------------------------------------------------------
+5.1 LISTAR TODOS LOS CLIENTES
+--------------------------------------------------------------------------------
+Método:      GET
+URL:         /api/clientes
+Descripción: Retorna la lista completa de clientes con sus vehículos asociados.
+
+Respuesta exitosa (200):
+{
+  "success": true,
+  "data": [
+    {
+      "id_cliente": 1,
+      "nombre": "Juan Pérez",
+      "telefono": "3001234567",
+      "correo": "juan@email.com",
+      "vehiculos": [ ... ]
+    }
+  ],
+  "total": 1
+}
+
+--------------------------------------------------------------------------------
+5.2 CREAR UN CLIENTE
+--------------------------------------------------------------------------------
+Método:      POST
+URL:         /api/clientes
+Descripción: Registra un nuevo cliente en el sistema.
+
+Headers:
+  Content-Type: application/json
+
+Body (JSON):
+{
+  "nombre":   "Juan Pérez",       [requerido] Nombre completo
+  "telefono": "3001234567",       [opcional]
+  "correo":   "juan@email.com"    [opcional] Debe ser único y válido
+}
+
+Respuesta exitosa (201):
+{
+  "success": true,
+  "message": "Cliente registrado exitosamente.",
+  "data": {
+    "id_cliente": 1,
+    "nombre": "Juan Pérez",
+    "telefono": "3001234567",
+    "correo": "juan@email.com"
+  }
+}
+
+--------------------------------------------------------------------------------
+5.3 OBTENER UN CLIENTE
+--------------------------------------------------------------------------------
+Método:      GET
+URL:         /api/clientes/{id}
+Descripción: Retorna el detalle de un cliente con todos sus vehículos.
+
+Parámetros de ruta:
+  id  →  ID del cliente (id_cliente)
+
+Respuesta exitosa (200):
+{
+  "success": true,
+  "data": {
+    "id_cliente": 1,
+    "nombre": "Juan Pérez",
+    "correo": "juan@email.com",
+    "vehiculos": [ ... ]
+  }
+}
+
+Error (404):
+{
+  "success": false,
+  "message": "Cliente no encontrado."
+}
+
+--------------------------------------------------------------------------------
+5.4 ACTUALIZAR UN CLIENTE
+--------------------------------------------------------------------------------
+Método:      PUT
+URL:         /api/clientes/{id}
+Descripción: Actualiza los datos de un cliente existente.
+
+Headers:
+  Content-Type: application/json
+
+Body (JSON): Mismos campos que POST
+
+Respuesta exitosa (200):
+{
+  "success": true,
+  "message": "Cliente actualizado exitosamente.",
+  "data": { ... }
+}
+
+--------------------------------------------------------------------------------
+5.5 ELIMINAR UN CLIENTE
+--------------------------------------------------------------------------------
+Método:      DELETE
+URL:         /api/clientes/{id}
+Descripción: Elimina un cliente del sistema por su ID.
+
+Respuesta exitosa (200):
+{
+  "success": true,
+  "message": "Cliente eliminado exitosamente."
+}
+
+Error (404):
+{
+  "success": false,
+  "message": "Cliente no encontrado."
+}
+
+--------------------------------------------------------------------------------
+5.6 VEHÍCULOS DE UN CLIENTE (ruta adicional)
+--------------------------------------------------------------------------------
+Método:      GET
+URL:         /api/clientes/{id}/vehiculos
+Descripción: Retorna todos los vehículos asociados a un cliente específico.
+             Útil para que una app móvil muestre el historial del cliente.
+
+Parámetros de ruta:
+  id  →  ID del cliente
+
+Respuesta exitosa (200):
+{
+  "success": true,
+  "cliente": "Juan Pérez",
+  "data": [
+    {
+      "id_vehiculo": 1,
+      "placa": "ABC123",
+      "servicio": "Lavado completo",
+      "estado": "Listo"
+    }
+  ],
+  "total": 1
+}
+
+Error (404):
+{
+  "success": false,
+  "message": "Cliente no encontrado."
+}
+
+================================================================================
+6. ENDPOINT DE ESTADO DE LA API
+================================================================================
+
+Método:      GET
+URL:         /api
+Descripción: Verifica que la API esté activa y lista para recibir peticiones.
+
+Respuesta (200):
+{
+  "success": true,
+  "app": "Rueda Verde API",
+  "version": "1.0",
+  "message": "API REST funcionando correctamente.",
+  "endpoints": {
+    "vehicles": "/api/vehicles",
+    "clientes": "/api/clientes"
+  }
+}
+
+================================================================================
+7. RESUMEN DE TODOS LOS ENDPOINTS
+================================================================================
+
+  MÉTODO    URL                              DESCRIPCIÓN
+  --------  -------------------------------  ------------------------------------
+  GET       /api                             Estado de la API
+  GET       /api/vehicles                    Lista todos los vehículos
+  POST      /api/vehicles                    Crea un vehículo
+  GET       /api/vehicles/{id}               Detalle de un vehículo
+  PUT       /api/vehicles/{id}               Actualiza un vehículo
+  DELETE    /api/vehicles/{id}               Elimina un vehículo
+  GET       /api/vehicles/estado/{estado}    Filtra por estado (adicional)
+  GET       /api/clientes                    Lista todos los clientes
+  POST      /api/clientes                    Crea un cliente
+  GET       /api/clientes/{id}               Detalle de un cliente
+  PUT       /api/clientes/{id}               Actualiza un cliente
+  DELETE    /api/clientes/{id}               Elimina un cliente
+  GET       /api/clientes/{id}/vehiculos     Vehículos de un cliente (adicional)
+
+================================================================================
+8. CONFIGURACIÓN CORS
+================================================================================
+
+Archivo: config/cors.php
+
+Permite que aplicaciones externas (móvil, web, Postman) consuman la API
+sin restricciones de origen. Configuración actual:
+
+  - Rutas cubiertas:     api/*
+  - Métodos permitidos:  GET, POST, PUT, DELETE, OPTIONS
+  - Orígenes permitidos: * (todos)
+  - Headers permitidos:  * (todos)
+
+Para restringir el acceso a orígenes específicos en producción, modificar:
+  'allowed_origins' => ['https://mi-app-movil.com']
+
+================================================================================
+9. CÓMO PROBAR LA API
+================================================================================
+
+Opción 1 — Navegador (solo GET):
+  Abrir: http://localhost:8000/api/vehicles
+
+Opción 2 — Postman:
+  1. Abrir Postman
+  2. Crear nueva petición
+  3. Seleccionar método (GET, POST, PUT, DELETE)
+  4. Ingresar la URL: http://localhost:8000/api/vehicles
+  5. Para POST/PUT: ir a Body → raw → JSON y pegar el JSON del servicio
+
+Opción 3 — curl (terminal):
+  GET:    curl http://localhost:8000/api/vehicles
+  POST:   curl -X POST http://localhost:8000/api/vehicles \
+               -H "Content-Type: application/json" \
+               -d '{"placa":"ABC123","propietario":"Juan","servicio":"Lavado"}'
+  DELETE: curl -X DELETE http://localhost:8000/api/vehicles/1
