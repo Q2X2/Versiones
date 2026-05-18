@@ -4,43 +4,44 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Cliente;
+use Inertia\Inertia;
 
 /**
  * ClienteController
  *
- * Controlador CRUD para la gestión de clientes del autolavado.
- * Incluye mensajes flash de éxito y validación con mensajes en español.
+ * Controlador CRUD para clientes del autolavado.
+ * Retorna respuestas Inertia (React) en lugar de Blade.
  */
 class ClienteController extends Controller
 {
     /**
      * GET /clientes
-     * Muestra la lista de todos los clientes registrados.
+     * Retorna la página React Clientes/Index.
      */
     public function index()
     {
-        // Obtener todos los clientes con sus vehículos relacionados
         $clientes = Cliente::with('vehiculos')->get();
 
-        return view('clientes.index', compact('clientes'));
+        return Inertia::render('Clientes/Index', [
+            'clientes' => $clientes,
+        ]);
     }
 
     /**
      * GET /clientes/create
-     * Muestra el formulario para registrar un nuevo cliente.
+     * Retorna la página React Clientes/Create.
      */
     public function create()
     {
-        return view('clientes.create');
+        return Inertia::render('Clientes/Create');
     }
 
     /**
      * POST /clientes
-     * Valida y guarda un nuevo cliente en la base de datos.
+     * Valida y guarda un nuevo cliente.
      */
     public function store(Request $request)
     {
-        // Validación con mensajes de error en español
         $request->validate([
             'nombre'   => 'required|string|max:100',
             'telefono' => 'nullable|string|max:20',
@@ -51,37 +52,35 @@ class ClienteController extends Controller
             'correo.unique'   => 'Este correo ya está registrado.',
         ]);
 
-        // Crear cliente con los datos validados
         Cliente::create([
             'nombre'   => $request->nombre,
             'telefono' => $request->telefono,
             'correo'   => $request->correo,
         ]);
 
-        // Mensaje flash de éxito al crear
         return redirect()->route('clientes.index')
             ->with('success', 'Cliente registrado exitosamente.');
     }
 
     /**
      * GET /clientes/{id}/edit
-     * Muestra el formulario para editar un cliente existente.
+     * Retorna la página React Clientes/Edit.
      */
     public function edit($id)
     {
-        // Buscar cliente o retornar 404
         $cliente = Cliente::findOrFail($id);
 
-        return view('clientes.edit', compact('cliente'));
+        return Inertia::render('Clientes/Edit', [
+            'cliente' => $cliente,
+        ]);
     }
 
     /**
      * PUT /clientes/{id}
-     * Valida y actualiza los datos de un cliente existente.
+     * Valida y actualiza los datos del cliente.
      */
     public function update(Request $request, $id)
     {
-        // Validación ignorando el correo del cliente actual (unique)
         $request->validate([
             'nombre'   => 'required|string|max:100',
             'telefono' => 'nullable|string|max:20',
@@ -93,15 +92,12 @@ class ClienteController extends Controller
         ]);
 
         $cliente = Cliente::findOrFail($id);
-
-        // Actualizar campos del cliente
         $cliente->update([
             'nombre'   => $request->nombre,
             'telefono' => $request->telefono,
             'correo'   => $request->correo,
         ]);
 
-        // Mensaje flash de éxito al actualizar
         return redirect()->route('clientes.index')
             ->with('success', 'Cliente actualizado exitosamente.');
     }
@@ -114,7 +110,6 @@ class ClienteController extends Controller
     {
         Cliente::destroy($id);
 
-        // Mensaje flash de éxito al eliminar
         return redirect()->route('clientes.index')
             ->with('success', 'Cliente eliminado exitosamente.');
     }

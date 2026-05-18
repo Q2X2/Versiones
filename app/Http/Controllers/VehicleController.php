@@ -5,46 +5,51 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Vehicle;
 use App\Models\Cliente;
+use Inertia\Inertia;
 
 /**
  * VehicleController
  *
- * Controlador CRUD para la gestión de vehículos del autolavado.
- * Incluye mensajes flash de éxito y validación con mensajes en español.
+ * Controlador CRUD para vehículos del autolavado.
+ * Retorna respuestas Inertia (React) en lugar de Blade.
+ * Los errores de $request->validate se inyectan automáticamente en React.
  */
 class VehicleController extends Controller
 {
     /**
      * GET /vehicles
-     * Muestra la lista de todos los vehículos registrados (turnos).
+     * Retorna la página React Vehicles/Index con todos los vehículos.
      */
     public function index()
     {
-        // Obtener todos los vehículos con su cliente relacionado
+        // Obtener vehículos con cliente relacionado
         $vehicles = Vehicle::with('cliente')->get();
 
-        return view('vehicles.index', compact('vehicles'));
+        return Inertia::render('Vehicles/Index', [
+            'vehicles' => $vehicles,
+        ]);
     }
 
     /**
      * GET /vehicles/create
-     * Muestra el formulario para registrar un nuevo vehículo.
+     * Retorna la página React Vehicles/Create con lista de clientes.
      */
     public function create()
     {
-        // Pasar lista de clientes al formulario para el select
         $clientes = Cliente::all();
 
-        return view('vehicles.create', compact('clientes'));
+        return Inertia::render('Vehicles/Create', [
+            'clientes' => $clientes,
+        ]);
     }
 
     /**
      * POST /vehicles
-     * Valida y guarda un nuevo vehículo en la base de datos.
+     * Valida y guarda un nuevo vehículo. Los errores se inyectan en React.
      */
     public function store(Request $request)
     {
-        // Validación con mensajes de error en español
+        // Validación: errores se pasan automáticamente al componente React via Inertia
         $request->validate([
             'placa'       => 'required|string|max:20|unique:vehiculo,placa',
             'propietario' => 'required|string|max:100',
@@ -58,7 +63,6 @@ class VehicleController extends Controller
             'id_cliente.exists'    => 'El cliente seleccionado no existe.',
         ]);
 
-        // Crear el vehículo con los datos validados
         Vehicle::create([
             'placa'       => strtoupper($request->placa),
             'propietario' => $request->propietario,
@@ -66,46 +70,48 @@ class VehicleController extends Controller
             'modelo'      => $request->modelo,
             'servicio'    => $request->servicio,
             'estado'      => $request->estado ?? 'En espera',
-            'hora'        => $request->hora,
-            'id_cliente'  => $request->id_cliente,
+            'hora'        => $request->hora ?: null,
+            'id_cliente'  => $request->id_cliente ?: null,
         ]);
 
-        // Mensaje flash de éxito al crear
         return redirect()->route('vehicles.index')
             ->with('success', 'Vehículo registrado exitosamente.');
     }
 
     /**
      * GET /vehicles/{id}
-     * Muestra el detalle y estado de un vehículo específico.
+     * Retorna la página React Vehicles/Show con el detalle del vehículo.
      */
     public function show($id)
     {
-        // Buscar vehículo o retornar 404
         $vehicle = Vehicle::with('cliente')->findOrFail($id);
 
-        return view('vehicles.show', compact('vehicle'));
+        return Inertia::render('Vehicles/Show', [
+            'vehicle' => $vehicle,
+        ]);
     }
 
     /**
      * GET /vehicles/{id}/edit
-     * Muestra el formulario para editar un vehículo existente.
+     * Retorna la página React Vehicles/Edit con datos del vehículo.
      */
     public function edit($id)
     {
         $vehicle  = Vehicle::findOrFail($id);
         $clientes = Cliente::all();
 
-        return view('vehicles.edit', compact('vehicle', 'clientes'));
+        return Inertia::render('Vehicles/Edit', [
+            'vehicle'  => $vehicle,
+            'clientes' => $clientes,
+        ]);
     }
 
     /**
      * PUT /vehicles/{id}
-     * Valida y actualiza los datos de un vehículo existente.
+     * Valida y actualiza los datos del vehículo.
      */
     public function update(Request $request, $id)
     {
-        // Validación ignorando la placa del vehículo actual (unique)
         $request->validate([
             'placa'       => 'required|string|max:20|unique:vehiculo,placa,' . $id . ',id_vehiculo',
             'propietario' => 'required|string|max:100',
@@ -120,8 +126,6 @@ class VehicleController extends Controller
         ]);
 
         $vehicle = Vehicle::findOrFail($id);
-
-        // Actualizar campos del vehículo
         $vehicle->update([
             'placa'       => strtoupper($request->placa),
             'propietario' => $request->propietario,
@@ -129,11 +133,10 @@ class VehicleController extends Controller
             'modelo'      => $request->modelo,
             'servicio'    => $request->servicio,
             'estado'      => $request->estado,
-            'hora'        => $request->hora,
-            'id_cliente'  => $request->id_cliente,
+            'hora'        => $request->hora ?: null,
+            'id_cliente'  => $request->id_cliente ?: null,
         ]);
 
-        // Mensaje flash de éxito al actualizar
         return redirect()->route('vehicles.index')
             ->with('success', 'Vehículo actualizado exitosamente.');
     }
@@ -146,7 +149,6 @@ class VehicleController extends Controller
     {
         Vehicle::destroy($id);
 
-        // Mensaje flash de éxito al eliminar
         return redirect()->route('vehicles.index')
             ->with('success', 'Vehículo eliminado exitosamente.');
     }

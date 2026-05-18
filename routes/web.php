@@ -7,31 +7,18 @@ use App\Http\Controllers\LoginController;
 
 /*
 |--------------------------------------------------------------------------
-| Rutas Web - Rueda Verde Autolavado
+| Rutas Web - Rueda Verde Autolavado (React + Inertia)
 |--------------------------------------------------------------------------
-| Aquí se registran todas las rutas web de la aplicación.
-| Modelos: Vehicle (vehiculo) y Cliente (cliente)
+| Todas las rutas retornan componentes React via Inertia::render().
+| Los errores de validación se inyectan automáticamente en React.
 */
 
-// --- Autenticación ---
+// --- Login ---
 Route::get('/', [LoginController::class, 'index'])->name('index');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 
-// --- CRUD Vehículos ---
-// GET    /vehicles          → index   (lista de turnos)
-// GET    /vehicles/create   → create  (formulario registro)
-// POST   /vehicles          → store   (guardar vehículo)
-// GET    /vehicles/{id}     → show    (estado del vehículo)
-// GET    /vehicles/{id}/edit → edit   (formulario edición)
-// PUT    /vehicles/{id}     → update  (actualizar vehículo)
-// DELETE /vehicles/{id}     → destroy (eliminar vehículo)
+// --- CRUD Vehículos (Inertia → React) ---
 Route::resource('vehicles', VehicleController::class);
 
-// --- CRUD Clientes ---
-// GET    /clientes          → index   (lista de clientes)
-// GET    /clientes/create   → create  (formulario registro)
-// POST   /clientes          → store   (guardar cliente)
-// GET    /clientes/{id}/edit → edit   (formulario edición)
-// PUT    /clientes/{id}     → update  (actualizar cliente)
-// DELETE /clientes/{id}     → destroy (eliminar cliente)
+// --- CRUD Clientes (Inertia → React) ---
 Route::resource('clientes', ClienteController::class);

@@ -1,42 +1,66 @@
-TOMASHERNANDEZPADILLA_AA3_EV02
+TOMASHERNANDEZPADILLA_AA4_EV03
 ==============================
 Proyecto: Rueda Verde — Autolavado
-Actividad: AA3-EV02 Módulos codificados y probados
+Actividad: AA4-EV03 Componente frontend con React JS + Inertia
+
+
+TECNOLOGÍAS
+-----------
+- Laravel 12 (Backend)
+- React 18 (Frontend)
+- Inertia.js v2 (Puente Laravel ↔ React, sin API REST)
+- Vite (Bundler)
+- TailwindCSS v4
 
 REQUISITOS CUMPLIDOS
 --------------------
-✔ CRUD completo para mínimo 2 modelos relacionados (Vehicle y Cliente)
-✔ Validación de formularios con mensajes de error en español
-✔ Mensajes flash de éxito (crear, editar, eliminar)
-✔ Versionado con Git con commits descriptivos
+✔ Frontend desarrollado con React JS
+✔ Navegación funcional con Inertia Link (sin recargar página)
+✔ Formularios login y registro con React
+✔ Validaciones con $request->validate, errores inyectados en React
+✔ Mensajes flash de éxito/error compartidos globalmente
+✔ Soporte multi-idioma (lang/es/messages.php y lang/en/messages.php)
+✔ Comentarios en todos los componentes y controladores
+✔ Estándares: PascalCase en clases/componentes, snake_case en BD
 ✔ Sin vendor/ ni node_modules/ en el ZIP
+✔ Versionado con Git
 
+ESTRUCTURA REACT
+----------------
+resources/js/
+  app.jsx                    → Punto de entrada Inertia + React
+  Layouts/
+    MainLayout.jsx           → Layout principal con header y flash
+  Components/
+    InputField.jsx           → Campo de formulario reutilizable
+    FlashMessage.jsx         → Mensajes flash auto-ocultables
+  Pages/
+    Login.jsx                → Pantalla de login
+    Vehicles/
+      Index.jsx              → Lista de vehículos
+      Create.jsx             → Formulario registro
+      Edit.jsx               → Formulario edición
+      Show.jsx               → Detalle del vehículo
+    Clientes/
+      Index.jsx              → Lista de clientes
+      Create.jsx             → Formulario registro
+      Edit.jsx               → Formulario edición
 
-MODELOS
--------
-1. Vehicle (vehiculo)  — CRUD completo de vehículos en turno
-2. Cliente (cliente)   — CRUD completo de clientes del autolavado
-   Relación: Un cliente tiene muchos vehículos (hasMany / belongsTo)
+MULTI-IDIOMA
+------------
+lang/es/messages.php  → Traducciones en español
+lang/en/messages.php  → Traducciones en inglés
 
-MENSAJES FLASH
---------------
-- Vehículo registrado exitosamente.
-- Vehículo actualizado exitosamente.
-- Vehículo eliminado exitosamente.
-- Cliente registrado exitosamente.
-- Cliente actualizado exitosamente.
-- Cliente eliminado exitosamente.
-
-CONFIGURACIÓN (.env)
---------------------
-DB_DATABASE=autolavado
-DB_USERNAME=root
-DB_PASSWORD=
-
-COMANDOS
---------
+INSTALACIÓN
+-----------
 composer install
+npm install
+npm run build
 php artisan migrate:fresh
-php -S 127.0.0.1:8081 -t public
+php artisan serve
 
-Abrir: http://127.0.0.1:8081
+O para desarrollo con hot-reload:
+php artisan serve  (en una terminal)
+npm run dev        (en otra terminal)
+
+Abrir: http://localhost:8000
