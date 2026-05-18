@@ -8,9 +8,9 @@ use App\Models\Cliente;
 
 /**
  * VehicleController
- * 
+ *
  * Controlador CRUD para la gestión de vehículos del autolavado.
- * Maneja las operaciones: listar, crear, guardar, ver, editar, actualizar y eliminar.
+ * Incluye mensajes flash de éxito y validación con mensajes en español.
  */
 class VehicleController extends Controller
 {
@@ -40,7 +40,7 @@ class VehicleController extends Controller
 
     /**
      * POST /vehicles
-     * Guarda un nuevo vehículo en la base de datos.
+     * Valida y guarda un nuevo vehículo en la base de datos.
      */
     public function store(Request $request)
     {
@@ -70,7 +70,9 @@ class VehicleController extends Controller
             'id_cliente'  => $request->id_cliente,
         ]);
 
-        return redirect()->route('vehicles.index');
+        // Mensaje flash de éxito al crear
+        return redirect()->route('vehicles.index')
+            ->with('success', 'Vehículo registrado exitosamente.');
     }
 
     /**
@@ -99,7 +101,7 @@ class VehicleController extends Controller
 
     /**
      * PUT /vehicles/{id}
-     * Actualiza los datos de un vehículo existente.
+     * Valida y actualiza los datos de un vehículo existente.
      */
     public function update(Request $request, $id)
     {
@@ -131,7 +133,9 @@ class VehicleController extends Controller
             'id_cliente'  => $request->id_cliente,
         ]);
 
-        return redirect()->route('vehicles.index');
+        // Mensaje flash de éxito al actualizar
+        return redirect()->route('vehicles.index')
+            ->with('success', 'Vehículo actualizado exitosamente.');
     }
 
     /**
@@ -142,6 +146,8 @@ class VehicleController extends Controller
     {
         Vehicle::destroy($id);
 
-        return redirect()->route('vehicles.index');
+        // Mensaje flash de éxito al eliminar
+        return redirect()->route('vehicles.index')
+            ->with('success', 'Vehículo eliminado exitosamente.');
     }
 }

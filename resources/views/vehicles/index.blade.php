@@ -31,12 +31,12 @@
     <div class="card-turno">
 
         <div>
-            {{-- Información del vehículo --}}
+            {{-- Información principal del vehículo --}}
             <p><strong>{{ $vehicle->propietario }}</strong></p>
             <p>{{ $vehicle->servicio }}</p>
             <p style="font-size:12px; color:#888;">Placa: {{ $vehicle->placa }}</p>
             <p style="font-size:12px; color:#888;">Estado: {{ $vehicle->estado }}</p>
-            {{-- Mostrar cliente si está asociado --}}
+            {{-- Cliente asociado si existe --}}
             @if($vehicle->cliente)
                 <p style="font-size:12px; color:#48C9B0;">
                     Cliente: {{ $vehicle->cliente->nombre }}
@@ -47,21 +47,21 @@
         <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
             <img src="/img/carro.jpg" class="avatar" alt="Vehículo">
 
-            {{-- Botón ver detalle --}}
+            {{-- Ver detalle --}}
             <a href="{{ route('vehicles.show', $vehicle->id_vehiculo) }}"
                style="font-size:12px; color:#555;">Ver</a>
 
-            {{-- Botón editar --}}
+            {{-- Editar --}}
             <a href="{{ route('vehicles.edit', $vehicle->id_vehiculo) }}"
                style="font-size:12px; color:#48C9B0;">Editar</a>
 
-            {{-- Formulario eliminar --}}
+            {{-- Eliminar con confirmación --}}
             <form action="{{ route('vehicles.destroy', $vehicle->id_vehiculo) }}" method="POST">
                 @csrf
                 @method('DELETE')
                 <button type="submit"
                     style="font-size:11px; padding:4px 8px; background:#e74c3c; color:white; width:auto;"
-                    onclick="return confirm('¿Eliminar este vehículo?')">
+                    onclick="return confirm('¿Estás seguro de eliminar este vehículo?')">
                     Eliminar
                 </button>
             </form>
@@ -69,7 +69,7 @@
 
     </div>
     @empty
-    {{-- Mensaje si no hay vehículos --}}
+    {{-- Mensaje cuando no hay vehículos --}}
     <p style="padding:20px; text-align:center; color:#888;">No hay vehículos registrados.</p>
     @endforelse
 

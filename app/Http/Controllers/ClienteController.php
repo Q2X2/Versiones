@@ -7,9 +7,9 @@ use App\Models\Cliente;
 
 /**
  * ClienteController
- * 
+ *
  * Controlador CRUD para la gestión de clientes del autolavado.
- * Maneja las operaciones: listar, crear, guardar, editar, actualizar y eliminar.
+ * Incluye mensajes flash de éxito y validación con mensajes en español.
  */
 class ClienteController extends Controller
 {
@@ -36,29 +36,31 @@ class ClienteController extends Controller
 
     /**
      * POST /clientes
-     * Guarda un nuevo cliente en la base de datos.
+     * Valida y guarda un nuevo cliente en la base de datos.
      */
     public function store(Request $request)
     {
         // Validación con mensajes de error en español
         $request->validate([
-            'nombre'  => 'required|string|max:100',
+            'nombre'   => 'required|string|max:100',
             'telefono' => 'nullable|string|max:20',
-            'correo'  => 'nullable|email|max:100|unique:cliente,correo',
+            'correo'   => 'nullable|email|max:100|unique:cliente,correo',
         ], [
             'nombre.required' => 'El nombre del cliente es obligatorio.',
             'correo.email'    => 'El correo electrónico no es válido.',
             'correo.unique'   => 'Este correo ya está registrado.',
         ]);
 
-        // Crear el cliente con los datos validados
+        // Crear cliente con los datos validados
         Cliente::create([
             'nombre'   => $request->nombre,
             'telefono' => $request->telefono,
             'correo'   => $request->correo,
         ]);
 
-        return redirect()->route('clientes.index');
+        // Mensaje flash de éxito al crear
+        return redirect()->route('clientes.index')
+            ->with('success', 'Cliente registrado exitosamente.');
     }
 
     /**
@@ -75,7 +77,7 @@ class ClienteController extends Controller
 
     /**
      * PUT /clientes/{id}
-     * Actualiza los datos de un cliente existente.
+     * Valida y actualiza los datos de un cliente existente.
      */
     public function update(Request $request, $id)
     {
@@ -99,7 +101,9 @@ class ClienteController extends Controller
             'correo'   => $request->correo,
         ]);
 
-        return redirect()->route('clientes.index');
+        // Mensaje flash de éxito al actualizar
+        return redirect()->route('clientes.index')
+            ->with('success', 'Cliente actualizado exitosamente.');
     }
 
     /**
@@ -110,6 +114,8 @@ class ClienteController extends Controller
     {
         Cliente::destroy($id);
 
-        return redirect()->route('clientes.index');
+        // Mensaje flash de éxito al eliminar
+        return redirect()->route('clientes.index')
+            ->with('success', 'Cliente eliminado exitosamente.');
     }
 }

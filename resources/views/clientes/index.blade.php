@@ -1,5 +1,5 @@
 {{-- Vista: Lista de Clientes --}}
-{{-- Muestra todos los clientes registrados con opción de editar y eliminar --}}
+{{-- Muestra todos los clientes con sus vehículos asociados y acciones CRUD --}}
 
 @extends('layouts.app')
 
@@ -42,6 +42,7 @@
         </div>
 
         <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+
             {{-- Botón editar --}}
             <a href="{{ route('clientes.edit', $cliente->id_cliente) }}"
                style="font-size:12px; color:#48C9B0;">Editar</a>
@@ -52,7 +53,7 @@
                 @method('DELETE')
                 <button type="submit"
                     style="font-size:11px; padding:4px 8px; background:#e74c3c; color:white; width:auto;"
-                    onclick="return confirm('¿Eliminar este cliente?')">
+                    onclick="return confirm('¿Estás seguro de eliminar este cliente?')">
                     Eliminar
                 </button>
             </form>
