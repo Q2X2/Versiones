@@ -1,0 +1,30 @@
+.estado-container{
+    padding:20px;
+}
+
+.car-card{
+    background:#5ED6A3;
+    padding:15px;
+    border-radius:10px;
+}
+
+.car-card img{
+    width:100%;
+    border-radius:10px;
+}
+
+.info{
+    margin-top:20px;
+}
+
+.info-item{
+    display:flex;
+    justify-content:space-between;
+    padding:10px 0;
+    border-bottom:1px solid #eee;
+}
+
+.calificacion{
+    text-align:center;
+    margin-top:15px;
+}
