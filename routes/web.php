@@ -3,26 +3,36 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\ClienteController;
-use App\Http\Controllers\LoginController;
 use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
-| Rutas Web - Rueda Verde Autolavado (React + Inertia)
+| Rutas Web - Rueda Verde Autolavado (React + Inertia + Laravel Breeze)
 |--------------------------------------------------------------------------
-| Todas las rutas retornan componentes React via Inertia::render().
-| Los errores de validación se inyectan automáticamente en React.
+| Las rutas de autenticación (login, register, logout, etc.) se
+| definen en routes/auth.php e incluidas al final de este archivo.
+|
+| Las rutas del sistema (dashboard, vehículos, clientes) están protegidas
+| con el middleware 'auth' de Laravel Breeze.
 */
 
-// --- Login ---
-Route::get('/', [LoginController::class, 'index'])->name('index');
-Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+// --- Ruta raíz → redirige al login de Breeze ---
+Route::get('/', function () {
+    return redirect()->route('login');
+});
 
-// --- Dashboard (panel de control con estadísticas y explorador de API) ---
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+// --- Rutas protegidas por autenticación (Laravel Breeze) ---
+Route::middleware(['auth'])->group(function () {
 
-// --- CRUD Vehículos (Inertia → React) ---
-Route::resource('vehicles', VehicleController::class);
+    // Dashboard principal con estadísticas y explorador de API
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-// --- CRUD Clientes (Inertia → React) ---
-Route::resource('clientes', ClienteController::class);
+    // CRUD Vehículos (Inertia → React)
+    Route::resource('vehicles', VehicleController::class);
+
+    // CRUD Clientes (Inertia → React)
+    Route::resource('clientes', ClienteController::class);
+});
+
+// --- Rutas de autenticación generadas por Laravel Breeze ---
+require __DIR__.'/auth.php';
